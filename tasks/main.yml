@@ -1,0 +1,26 @@
+---
+# tasks file for role
+#
+
+- name: Remove cloud-init package
+  ansible.builtin.package:
+    name: cloud-init
+    state: absent
+  tags: [ cloud-init ]
+  register: cloudinit_package
+  when: cloudinit.cleanup
+
+- name: Remove cloud-init service
+  ansible.builtin.service:
+    name: cloud-init
+    state: stopped
+    enabled: no
+  tags: [ cloud-init ]
+  when: cloudinit_package.changed and cloudinit.cleanup
+
+- name: Remove cloud-init network config
+  ansible.builtin.file:
+    path: /etc/network/interfaces.d/50-cloud-init
+    state: absent
+  tags: [ cloud-init ]
+  when: cloudinit.cleanup
