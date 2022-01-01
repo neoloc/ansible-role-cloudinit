@@ -17,6 +17,10 @@
     enabled: no
   tags: [ cloud-init ]
   when: cloudinit_package.changed and cloudinit.cleanup
+  register: cloudinit_service
+  failed_when:
+    - '"Could not find the requested service" not in cloudinit_service.stdout'
+    - cloudinit_service.rc != 0
 
 - name: Remove cloud-init network config
   ansible.builtin.file:
