@@ -16,15 +16,16 @@
     state: stopped
     enabled: no
   tags: [ cloud-init ]
-  when: cloudinit_package.changed and cloudinit.cleanup
-  register: cloudinit_service
-  failed_when:
-    - '"Could not find the requested service" not in cloudinit_service.stdout'
-    - cloudinit_service.rc != 0
+  when:
+    - cloudinit_package.changed
+    - cloudinit.cleanup
+    - (ansible_distribution == "Debian" ) or (ansible_distribution == "Ubuntu")
 
 - name: Remove cloud-init network config
   ansible.builtin.file:
     path: /etc/network/interfaces.d/50-cloud-init
     state: absent
   tags: [ cloud-init ]
-  when: cloudinit.cleanup
+  when:
+    - cloudinit.cleanup
+    - (ansible_distribution == "Debian" ) or (ansible_distribution == "Ubuntu")
